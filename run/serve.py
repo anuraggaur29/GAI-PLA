@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 from pathlib import Path
+import httpx
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -37,6 +39,32 @@ app.include_router(chat_router, prefix="/api")
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+
+@app.on_event("startup")
+async def start_keep_alive():
+    """Background task to keep Render free tier alive by pinging the external health URL."""
+    external_url = os.environ.get("RENDER_EXTERNAL_URL") or os.environ.get("KEEP_ALIVE_URL")
+    if not external_url:
+        logging.info("[Keep-Alive] No external URL configured; skipping keep-alive worker.")
+        return
+
+    interval = int(os.environ.get("KEEP_ALIVE_INTERVAL_SECONDS", "300"))
+    health_url = f"{external_url.rstrip('/')}/health"
+
+    async def keep_alive_loop():
+        await asyncio.sleep(20)
+        logging.info(f"[Keep-Alive] Worker active: pinging {health_url} every {interval}s")
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            while True:
+                try:
+                    r = await client.get(health_url)
+                    logging.info(f"[Keep-Alive] Self-ping {health_url} -> {r.status_code}")
+                except Exception as e:
+                    logging.warning(f"[Keep-Alive] Ping failed: {e}")
+                await asyncio.sleep(interval)
+
+    asyncio.create_task(keep_alive_loop())
 
 
 # Static files must be mounted AFTER all API routes
