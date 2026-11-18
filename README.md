@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="resources/logo.png" alt="LearningMAP logo" width="300">
+  <img src="resources/logo.png" alt="GAI-PLA logo" width="300">
 </p>
 
-# LearningMAP: Learning via Memory and Personalization
+# GAI-PLA: Generative AI-Based Personalized Learning Agent
 
 <p align="center">
   <a href="./README.md"><img alt="English" src="https://img.shields.io/badge/English-BCDCF7?style=flat-square"></a>
