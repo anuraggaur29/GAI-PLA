@@ -14,8 +14,9 @@ COPY . /app
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -e .
 
-# Hugging Face Spaces exposes port 7860
-EXPOSE 7860
+# Expose port (Render sets $PORT, default to 10000)
+ENV PORT=10000
+EXPOSE 10000
 
-# Start GAI-PLA FastAPI application
-CMD ["uvicorn", "run.serve:app", "--host", "0.0.0.0", "--port", "7860"]
+# Start FastAPI application using the PORT env var
+CMD ["sh", "-c", "uvicorn run.serve:app --host 0.0.0.0 --port ${PORT:-10000}"]
