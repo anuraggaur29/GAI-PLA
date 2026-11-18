@@ -3,9 +3,9 @@ requires = ["setuptools>=75.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "openail"
+name = "gai-pla"
 version = "0.1.0"
-description = "AI Education Assistant Backend"
+description = "GAI-PLA: Generative AI-Based Personalized Learning Agent"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115.0",
